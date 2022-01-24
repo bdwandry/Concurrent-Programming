@@ -1,0 +1,23 @@
+1. Question: How did you make sure that no students can enter while the landlord is in the room and checking? Explain your approach in details.
+	
+	My approach to solving this problem by not allowing students to enter or leave while the landlord is actively checking the room is done
+	by disabling the progression (by using semaphores) forwards for students. For the portions of code that dictate when a student enters 
+	or leaves, I've placed them in Semaphore blocks that will stop the action once Landlord triggers them. Then throughout the Landlords
+	function, I've strategically placed the different types blocking mechanisms that doesn't allow for the students to progress further until the 
+	semaphores are released (by the landlord). 
+	
+2. Question: How did you make sure that the landlord will not leave until all students have left the room? Explain your approach in details.
+	
+	I've placed in a global counting mechanism, using a static variable defined in the header file, that will add/subtract based at where that 
+	thread is in code. This global counting system has mechanics in place to make sure that it will be computed atomically during many thread 
+	calculations because its placed behind a mutex and semaphore. There is no worry of a race condition being met, even though this is a 
+	shared variable. 
+	
+3. Question: How did you make sure the message "After checking the room XX times, the landlord retires and is on vacation!" is the last message printed by your program?
+    
+	To solve this issue and make sure that the above message will always appear is the last variable is by placing one global counter that gets 
+	incremented when the student thread gets spawned (this occurs in main) and it will get decremented once the student process gets terminated
+	(you can find this portion in thread-support, close to the final print statement). Then inside thread.cpp, when the landlord is finishing up 
+	it's last iteration, there is a special case inside loop that will handle/wait for all of the student process to finish up their computations.
+	And guarentee that, that message will appear at the vary end.
+	

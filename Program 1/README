@@ -1,0 +1,157 @@
+Bryan Wandrych
+bdwandry
+bdwandry@mtu.edu
+M17571110
+9/29/21
+
+Note Please view in a text editor that doesn't have text wrapping enabled by default. Or else the diagrams are gonna look messed up.
+Notepad++ is a good example of a text editor to view this page.
+
+_________________________________________________________________________________________________________________________
+1. Question: Draw a diagram showing the parent-child relationship if the following program is run with command line argument 4. 
+How many processes are created? Explain step-by-step how these processes are created, especially who is created by whom.
+
+void main(int argc, char **argv) {
+	int i, n = atoi(argv[1]);
+	for (i = 1; i < n; i++)
+		if (fork())
+			break;
+	printf("Process %ld with parent %ld\n", getpid(), getppid());
+	sleep(1);
+}
+
+Answer: 
+
+A=Parent Process
+B=Child Process
+
+ ┌───┐
+ ┤ A ├
+ ├───┤
+   │  
+   │ 
+   │  
+ ┌─▼─┐ 
+ │B_1│
+ └───┘
+   │  
+   │  
+   │   
+ ┌─▼─┐
+ │c_1│ 
+ └───┘ 
+   │  
+  ...  
+   │ 
+ ┌─▼───┐
+ │n_n-1│ 
+ └─────┘ 
+
+Demonstrated above in the diagram. This forking tree will always become a straight line down starting at the parent process, this is because the parent process
+will fork to the child, and then the program breaks out of the loop, then the child process becomes a parent to another child process. This again will happen 
+N number of times. 
+
+_________________________________________________________________________________________________________________________
+2. Draw a diagram showing the parent-child relationship if the following program is run with command line argument 4.
+How many processes are created? Explain step-by-step how these processes are created, especially who is created by whom.
+
+void main(int argc, char **argv) {
+	int i, n = atoi(argv[1]);
+	for (i = 0; i < n; i++)
+		if (fork() <= 0)
+			break;
+	printf("Process %ld with parent %ld\n", getpid(), getppid());
+	sleep(1);
+{
+
+Answer: 
+
+
+           A=Parent Process
+           B=Child Process
+
+               ┌───┐
+   ┌─────┬─────┤ A ├─┬─────────┐
+   │     │     ├───┤ │         │ 
+   │     │     │     │         │
+   │     │     │     │         │
+   │     │     │     │         │
+ ┌─▼─┐ ┌─▼─┐ ┌─▼─┐ ┌─▼─┐     ┌─▼─┐
+ │B_1│ │B_2│ │B_3│ │B_4│.... │B_n│
+ └───┘ └───┘ └───┘ └───┘     └───┘
+ 
+ Demonstrated in the above diagram. This function will create N number of children for the original parent process. Because it breaks, those process will not go any further and it
+ is very rare for forking to ever result in a -1. 
+
+_________________________________________________________________________________________________________________________
+3. Draw a diagram showing the parent-child relationship if the following program is run with command line argument 3.
+How many processes are created? Explain step-by-step how these processes are created, especially who is created by whom.
+
+void main(int argc, char **argv) {
+	int i, n = atoi(argv[1]);
+	for (i = 0; i < n; i++)
+		if (fork() == -1)
+			break;
+	printf("Process %ld with parent %ld\n", getpid(), getppid());
+	sleep(1);
+}
+
+Answer: 
+
+                          A=Parent Process
+                          B=Child Process
+						  ...
+						  n=Child Process
+							
+                              ┌───┐
+               ┌──────────────┤ A ├───────────┐
+               │              ├───┘           │
+               │              │               │
+               │              │               │
+               ▼              │               │
+             ┌─▼─┐          ┌─▼─┐           ┌─▼─┐
+             │B_1│          │B_2│    ....   │B_n│
+            ─┴───┴┐        ─┴───┴           └───┘
+           │       │      │       
+           ▼       ▼      ▼       
+         ┌─▼─┐   ┌─◄─┐  ┌─▼─┐  
+         │c_1│   │c_2│  │c_3│  
+     ┌───┴───┘   └───┘  └───┘
+     │            ...    ...    
+     │
+   ┌─▼─┐
+   │d_1│
+   └───┘
+    ...
+
+This process tree will create a fractal pattern in which all left process are guarenteed to have children. But as you start moving left to right in the forking tree.
+The process to the right of the left process will have n-1 children. Thus the last process being created will have 0 children. 
+
+_________________________________________________________________________________________________________________________
+4.The histogram you obtained from the simple pinball game is always symmetric, even though the number of balls in each bin may be slightly different.
+However, if the histogram is significantly not symmetric, your program is definitely incorrect.
+Actually, this is a distribution you may have learned in your statistics and probability course. What is this distribution called? 
+What is the reason you believe the histogram is the named distribution by you? Answer this question with a good logic reasoning. 
+Without doing so (e.g., only writing done the answer with a vague reason), you will lose point for this portion.
+
+
+Example from my program:
+   Bins: 6
+   Balls: 30000000
+   
+  1-( 936602)-( 3.12%)|*****
+  2-(4683225)-(15.61%)|*************************
+  3-(9377423)-(31.26%)|**************************************************
+  4-(9373490)-(31.24%)|**************************************************
+  5-(4689902)-(15.63%)|*************************
+  6-( 939358)-( 3.13%)|*****
+  
+  
+Answer: 
+What is this distribution called? 
+	This would be known as a binomial distrubution. 
+	
+What is the reason you believe the histogram is the named distribution by you?
+	This is a binomial distribution due to the symmetry of the data being recorded and the lack of continuous datapoints (meaning you can't land in between two bins (a ball can't land in 3.5 bins
+	its only 3 or 4 for bin number)). 
+	

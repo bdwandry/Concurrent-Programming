@@ -1,0 +1,71 @@
+Name: Bryan Wandrych
+Username: bdwandry
+M-Number: M17571110
+
+1. The logic of your program
+	This program starts out by reading in a parameter from an argument that gets passed through via the command line. This passed through argument will represent the n.
+	This is the maximum/upper-limit of total number to be checked if they're prime or not. The initial conditions state that n must be greater than or equal to 3. If lower
+	The program will terminate with a print statement enclosed. After all of the initial conditions are passed, the program will then start out by spawning a Master Thread,
+	then passing along 2 to n numbers to a instantiated PrimeChecking Thread(s) by piping from master. This program works by using a Sieves paradigm, so it will only checked
+	if the previous threads that were declared as prime, are a multiple of the current prime being checked (i.e. if (current-prime % past-prime(s) != 0)). Once all of the numbers
+	are passed from 2 <= k <= n, then the program will pass along an ending sequence of -1 and the program will print the founded Primes array and gracefully terminate (all threads
+	included). 
+
+2. Why does your program work?
+	This program was constructed using "Linear Array Sorting Algorithm/Paradigm" defined on ThreadMentorsWiki. A lot of the concepts are used from this documented example.
+	Since this program is roughly architected based off of this design philosophy, the program is working in a similar approach to how each threads are threads are essientially
+	creating a linked list between each of the prior threads. This Primes checking algorithm takes it one step further by creating a doubly linked list between each of the threads,
+	in which all prior threads (that are deamed as primes) will be used if the current k thread (current thread being checked) is prime. If it is, another Prime Thread will be created 
+	at the end, essientially adding on to the linked list (of threads).
+
+3. The meaning, initial value and the use of each variable. Explain why their initial values and uses are correct. Justify your claim.
+	Global Variable(s):
+		extern int *Primes;            - This is the storage for the global Primes Array that is instiated in the beggining of the program. It will n number of elements and will store every checked prime accordingly.
+		const int END_OF_DATA = -1;    - This is global, but not modified at all throughout the program, all this variable does is passed along when the last number is checked to represent the end of checking.
+		                                 (This variable is used in the Linear Array Sorting Algorithm).
+									 
+	PrimeCheck : public Thread
+		int index                      -The current element that is being checked.
+		int ThreadID                   -Used to keep track of the current Thread Identification Number, this will get incremented accordingly per number being passed by each thread.
+		int PrintPrime(char * buffer)  -Simply used for printing.
+		int CurrentThreadID()          -The purpose of this function is to return the current ThreadID. It will be used when printing sends, i.e. P2 sends 5 to P3. 
+		int Index;                     -The passed through number from master.
+		int neighbor;                  -To see if there is a neighboring thread.
+		SynOneToOneChannel *beforeChan;-This keeps track of the previous threads that have a prime number.
+		SynOneToOneChannel *afterChan; -This keeps track of the next threads that have a prime number.
+		PrimeCheck *primecheck;        -This will be the location of the next prime thread.
+		
+	class MasterThread : public Thread
+		MasterThread(int ThreadID, int n); -Used to pass through relavent information from Main to start the MasterThread Thread.
+		int PrintMaster(char * buffer);    -Simply used for printing.
+		int n;                             -This represend the total number of primes aloud to be checked. 
+		int TotalNumberOfPrimes;           -This represend the total number of primes aloud to be checked. 
+		SynOneToOneChannel *beforeChan;    -This keeps track of the previous threads that have a prime number.
+		SynOneToOneChannel *afterChan;     -This keeps track of the next threads that have a prime number.
+		PrimeCheck *primecheck;            -This will be the location of the next prime thread.
+		
+4. Answer the following:
+	(a) Can we use asynchronous channels to solve this problem? If you say "yes", prove it with a convincing argument. If you say "no", show a counter-example.
+			Yes, this program can be computed asynchronously. We would then think of master as placing all of the numbers into a buffer, in this case of this program, 
+			it would be placed into p2. P2 would then start pushing out each recieved value in in the order their recieved, one-by-one. Then building out the list of threads
+			in order based on their received value. 
+	
+	(b)If the last thread in the chain receives a number larger than the one this thread memorized, then the incoming number must be a prime number. 
+	   Why is this true? Prove this fact with a convincing argument.
+			Given a number that is greater than the last memorized prime number. If the larger number is not prime, that means it would be a multiple of the past primes. 
+			The last thread would only be reached if it has managed to make through all of the checkings of the previous primes. Which would indicate that the last larger
+			number would be prime. 
+	   
+	(c)Explain how you can fill the array Primes elements in a consecutive way.
+			Throughout this program, each thread is incremented based off the last. So starting out the ThreadID (passed through master) at zero and then passing it along to 
+			their respected Prime Checking Threads. Each Prime Checking Thread (afterwords) created is directly tied to their respeced ThreadID, meaning that each ThreadID being used is directly
+			connected to the current number being checked. The array will only be modified at the respected ThreadID -1 location. Which means that every location in the array will be modified
+			consecutively.
+	
+	(d)You do not need a mutex to protect the global array Primes when a prime thread is saving its memorized prime number? Prove this with a convincing argument.
+			The Primes array does not need to be behind a mutex lock because each PrimeChecking thread being created is executing in a sequential fashion based on the number being passed/recieved.
+			These threads are acting in sequential fashion meaning, one thread will only must compute before another one can continue to "memorize" the next prime number. 
+
+5.You must terminate your program gracefully. More precisely, The last three output lines must be printed by Master.
+	This program does terminate gracefully, all respected PrimeCheck threads are placed with their respected protocols to make sure they will terminate.
+	As well in master, the program will wait (Join()) for all of the PrimeCheck thread created to terminate. Thus guarenting the last 3 lines in master will always print last.

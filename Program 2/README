@@ -1,0 +1,39 @@
+Bryan Wandrych
+bdwandry
+M17571110
+
+1. The logic of your program
+	The logic of my program is that it will read in a DataFile using File Redirection, it will then take that data and setup Shared Memory so that other programs
+	can use the data that is in their. This previous sentence describes the purpose of main. Qsort will be called from main and use the Allocated Shared memory 
+	and sort the data within' it. Merge will take also take in two separate sorted arrays (via shared memory from main) and will merge using a modified binary 
+	search algorithm.
+	
+2. Why does your program work?
+	My program partially works, Binary Search is not fully implemented due to not fully understanding the concept of merging two separate arrays with n+m processes.
+	An attempt was made on that front but, unfortunitel it could not be completed in time. But, I do have a fully working Main.c and a Qsort.c that is running concurrently
+	with two processes. My shared memory allocation logic is quite simple, I have one main shared memory allocation array that will will be used to store the input arrays 
+	data from the text file. The first k bytes will be stored starting at the beggining of the array. The m number of bytes will be stored at the kth element. And n number
+	of bytes will be stored at the kth + mth number. Each algorithm will get their respected memory with indexing information. Qsort works just fine and it seems to be fully
+	implemeted in the accordance of the class. It takes the 0...k number of elements from the single array and will sort via those two indexes accordingly. 
+
+3. Explain the allocation and use of each shared memory segment.
+	My shared memory allocation logic is quite simple, I have one main shared memory allocation array that will will be used to store the input arrays 
+	data from the text file. The first k bytes will be stored starting at the beggining of the array. The m number of bytes will be stored at the kth element. And n number
+	of bytes will be stored at the kth + mth number.
+	
+4. Are there potential race conditions (i.e., processes use and update a shared data item concurrently) in your program and in the program specification?
+	There are definitely potential race conditions that may occur, but in Qsort, each item is broken down into sub-problems recursively that will ultimately 
+	not touch another other element cause those are also being swapped concurrently. 
+	
+5. How do you construct an argument list that is passed from program main to program qsort?
+	Argv[1] = is the shared mememory key from main.
+	Argv[2] = is the is the starting index of the its elements.
+	Argv[3] = is the end index - 1 of its elements.
+	Argv[4] = is the totalshared memory allocation size. 
+	
+6. How do you construct an argument list that is passed from program main to program merge?
+	Argv[1] = is the shared mememory key from main - primary array holding all data.
+	Argv[2] = is the size k array.
+	Argv[3] = is the size m array.
+	Argv[4] = is the size n array. 
+	Argv[5] = is another shared memory buffer created by main that just stores x[] and y[] data. 

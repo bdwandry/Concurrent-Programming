@@ -1,0 +1,63 @@
+Bryan Wandrych
+bdwandry
+11/3/21
+
+1. 	Question: Are there any race conditions in this even-odd sort as suggested? Why?
+		No there are no race conditions to contend too or take care of in this project. The reasoning why is that we are dealing with Even elements (2k) and odd elements (2k+1)
+		separately. And when it iterates through each of the elements, its only touch (i-1, i) elements for only that thread. So which means there no communications that are
+		needed to stop one thread from overlapping data from another thread. 
+
+2. 	Question: Prove rigorously that this algorithm does sort the input number correctly and takes no more than n iterations to sort an array of n numbers.
+		This algorithm at most will do n number of swaps. 
+		
+		//Assumption that there are no base cases that will check for a single a element in the array - my program will.
+		//Meaning 1 iteration is needed for i. 
+		if n = 1 (meaning there is only one array element), 
+		n will run and only even will try to swap.
+		Since, there other elements to contend too, there will only be one iteration of i needed, aka only at most n number of swaps.
+		
+		But, for the most part, this should only take in between upperbound(n/2) or upperbound(i/2) iterations. 
+		if n = 2,
+		element 0 and 1 will swap, this would only take one swap of even algorithm, then the data is sorted at 1 iteration of n = 2.
+
+		The main reasoning is that were allowing for more than one swapping of elements and breaking down even/odd element numbers. 
+		
+3.  Question: In each iteration, the main() does the creation and join for the completion of n/2 threads twice, 
+	once for an even pass and the other for an odd pass. 
+	Compared with simple comparisons, it requires a significant amount of time in creating and joining threads. 
+	If you are allowed to use extra variables/arrays and busy waiting, can you just create n/2 threads and let them do both 
+	the even pass and the odd pass in the same iteration without race conditions and still deliver correct results? 
+	More precisely, thread Tk compares x[k-1] and x[k] in an even pass, and then compare x[k] and x[k+1] in an odd pass? 
+	Suggest a solution and discuss its correctness.
+		Yes, I believe you could do this in a more efficient manner with extra variables. Here is my proposed algorithm below: 
+		You could make this algorithm more efficient by having three separate arrays, one array will contain the 
+		elements of even indices of the main array. The 2nd will contain the elements of odd indices of the main array. 
+		The third would be a merged array of in order elements.
+		
+		Next you could then spawn up n/2 and check the following: 
+			Even array: 
+				You'd check the index of second (index number = 1) element contained in its array (even).
+				You'd check the first index (index number = 0) of the odd array.
+				Compare their values.
+				Then in a third array that was created, you'd place your output into that array.
+			
+			Then
+			Odd Array: 
+				You'd check the index of Third (index number = 2) element contained in its array (odd).
+				You'd check the Second index (index number = 1) of the even array.
+				Compare their values.
+				Then in a third array that was created, you'd place your output into that array.
+			Continue to loop until all elements from the original array are stored into the third. 
+			
+		This approach would save time on creating/joining threads, because it would allow for one thread to do more than one computation at once.
+		However, it may be faster, but its less space efficient. 
+
+4.  Question: Furthermore, can you just create n/2 threads at the very beginning and let them do all the even pass and odd pass comparisons? 
+	In this way, you save more time on creating and joining threads. 
+	Suggest a solution and discuss its correctness.
+		Since we already know that there is at most the upperbound(n/2) threads created in this process, we could take each some of our iteration code
+		out of main and reduce the number of threads created by not needing to create a separate thread for each swap. Each thread could swap both even and odd elements.
+		This would turn the algorithm into a bubble sort, but it would still allow for more than one swap per thread, thus reducing time it takes to spinup or join (wait)
+		for other threads to continue. But, by doing this, you will have to allow for busy waiting and have mutex instantiated because more than one thread can interact
+		with more than one element. 
+		

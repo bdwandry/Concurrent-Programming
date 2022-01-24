@@ -1,0 +1,54 @@
+Name: Bryan Wandrych
+Username: bdwandry
+M-Number: M17571110
+
+Note*** This program is not fully functional, I've tried building out the logic as much as possible. But I was unable to get the monitors to
+mesh together correctly. This program will run for a little bit, but it will eventually dead-lock and you will need to kill it by 'ctrl + c'.
+
+1. Question: How do you guarantee that only three elves will ask questions?
+		In my program, I try to guarantee that only three elves are allowed to ask questions at a time because of there is an array of elves that
+		gets added to accordingly. Once the array of elves are full, they can attempt/wait to ask santa a question. Then they're returned and the
+		array is overwritten. 
+
+2. Question: Show that why no elf will leave before the questions are answered.
+		Elves array: [ [1], [2], [3] ] is full.
+		if (elves is full) then
+			attempt to ask question/wake up santa.
+		...
+		question answered
+		then elves leave the array.
+
+
+3. Question: Show that while three elves are waiting for an answer, no other elves can cut in and ask questions.
+		Elves array: [ [1], [2], [3] ] is full.
+		elves are forced to wait by condition
+		if (elves is full) then
+			attempt to ask question/wake up santa.
+		...
+		question answered
+		then elves leave the array.
+		elves are released from condition
+
+4. Question: How do you guarantee that Santa only answers question while he is not sleeping.
+		This is done by a wake up condition, while he is sleeping, the condition hold. 
+		He will wake up once the pre-conditions are met. 
+
+5. Question: Show that when Santa is wakened up by a reindeer, this reindeer is the last one coming back from vacation.
+		...
+		Santa is preparing sleighs.
+				Elf 1 has a problem
+				Elf 3 has a problem
+			The last reindeer 4 wakes up Santa.
+		The team flies off (1)!
+		...
+
+6. Question: How do you make sure that Santa always handles reindeers first.
+		In the santa thread, it is always checkong reindeer first before elves. Plus several steps are in place to make sure
+		that all reindeer are handled with priority. Well suppose to be.
+
+7. Question: Show that while Santa is attaching the sleigh and delivering toys, all reindeers are there. They won't sneak out for vacation.
+		I cannot guarantee this in the failed program.
+
+8. Question: Show that while Santa is attaching the sleigh and delivering toys, elves will not ask questions.
+		In the santa thread, it is always checkong reindeer. Plus several steps are in place to make sure
+		that all reindeer are handled with priority. Well suppose to be.
